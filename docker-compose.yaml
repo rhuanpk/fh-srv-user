@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+   app:
+      build:
+         context: .
+         dockerfile: Dockerfile
+      environment:
+         AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+         AWS_SECRET_KEY: ${AWS_SECRET_KEY}
+         AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+         AWS_COGNITO_USER_POOL_ID: ${AWS_COGNITO_USER_POOL_ID}
+         AWS_COGNITO_APP_CLIENT_ID: ${AWS_COGNITO_APP_CLIENT_ID}
+         AWS_COGNITO_APP_CLIENT_SECRET: ${AWS_COGNITO_APP_CLIENT_SECRET}
+         AWS_REGION: ${AWS_REGION}
+      ports:
+         - "8080:8080"
+      networks:
+         - app-network
+networks:
+   app-network:
+      driver: bridge
