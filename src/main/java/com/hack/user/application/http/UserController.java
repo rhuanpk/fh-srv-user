@@ -14,6 +14,10 @@ import com.hack.user.application.JwtValidationService;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +36,12 @@ public class UserController {
     @Autowired
     private LoginGateway loginGateway;
 
+    @Operation(
+            responses = {
+                    @ApiResponse(content = @Content(mediaType = "application/json",
+                            schema = @Schema(type = "object", example = "{\"message\": \"string\"}")))
+            }
+    )
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody UserDto userDto) throws Exception {
         CadastrarUsuarioInput input = new CadastrarUsuarioInput(userDto.email(), userDto.password());
@@ -54,9 +64,15 @@ public class UserController {
         }
     }
 
+    @Operation(
+            responses = {
+                    @ApiResponse(content = @Content(mediaType = "application/json",
+                            schema = @Schema(type = "object", example = "{\"token\": \"string\"}")))
+            }
+    )
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> credentials) {
-        LoginInput input = new LoginInput(credentials.get("email"), credentials.get("password"));
+    public ResponseEntity<Map<String, String>> login(@RequestBody UserDto userDto) {
+        LoginInput input = new LoginInput(userDto.email(), userDto.password());
         Login login = new Login(this.loginGateway);
         try {
             LoginOutput output = login.executar(input);
@@ -66,7 +82,12 @@ public class UserController {
         }
     }
 
-    // Endpoint para validar o token e retornar o email
+    @Operation(
+            responses = {
+                    @ApiResponse(content = @Content(mediaType = "application/json",
+                            schema = @Schema(type = "object", example = "{\"message\": \"string\", \"email\": \"string\"}")))
+            }
+    )
     @GetMapping("/validateToken")
     public ResponseEntity<Map<String, String>> validateToken(@RequestParam String token) {
         Map<String, String> response = jwtValidationService.validateToken(token);
